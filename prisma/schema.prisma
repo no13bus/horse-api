@@ -1,0 +1,74 @@
+// =================================================================
+// Prisma Configuration
+// =================================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// =================================================================
+// Enums
+// =================================================================
+
+/// Horse health status
+enum HealthStatus {
+  Healthy /// Healthy
+  Injured /// Injured
+  Recovering /// In recovery
+  Unknown /// Unknown
+}
+
+// =================================================================
+// Models
+// =================================================================
+
+/// Horse information
+model Horse {
+  // Identifiers
+  id Int @id @default(autoincrement()) /// Unique identifier
+
+  // Basic Information
+  name  String /// Horse name
+  age   Int /// Age
+  breed String /// Breed
+
+  // Health Information
+  healthStatus HealthStatus @default(Unknown) /// Health status
+
+  // Relationships
+  ownerRelation Owner @relation(fields: [owner], references: [id], onDelete: Cascade) /// Owner reference
+  owner         Int /// Owner ID
+
+  // Timestamps
+  createdAt DateTime @default(now()) /// Creation timestamp
+  updatedAt DateTime @updatedAt /// Last update timestamp
+
+  // Indexes
+  @@index([owner])
+  @@index([healthStatus])
+}
+
+/// Owner information
+model Owner {
+  // Identifiers
+  id Int @id @default(autoincrement()) /// Unique identifier
+
+  // Basic Information
+  name  String /// Owner name
+  email String @unique /// Email address
+
+  // Relationships
+  horses Horse[] /// Owned horses
+
+  // Timestamps
+  createdAt DateTime @default(now()) /// Creation timestamp
+  updatedAt DateTime @updatedAt /// Last update timestamp
+
+  // Indexes
+  @@index([email])
+}
