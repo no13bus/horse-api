@@ -1,0 +1,26 @@
+version: '3.9'
+
+networks:
+  test-network:
+
+
+services:
+  test-db:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: '9Jc9]lA0s'
+      POSTGRES_DB: horse_test
+    ports:
+      - '5433:5432'
+    networks:
+      - test-network
+
+  test:
+    build: .
+    env_file: .env.test
+    depends_on:
+      - test-db
+    command: pnpm run test:e2e
+    networks:
+      - test-network
